@@ -39,6 +39,4 @@ typechain
 package-lock.json
 
 #Hardhat files
-cache
-artifacts
 hardhat.config.js
