@@ -17,11 +17,13 @@ function MainContent({ Component, pageProps }) {
   const [isConnected,setIsConnected] = useState(false);
   const [pageTitle, setPageTitle] = useState('Hello, Create a universe of your own');
 
+  const [isError,setIsError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('Error');
+
   let isUsed = false;
   let provider;
 
   useEffect(() => {
-    connectProvider();
     if(!isConnected && !isUsed){
       isUsed = true;
       connectWallet();
@@ -37,24 +39,40 @@ function MainContent({ Component, pageProps }) {
     const accounts = await window.ethereum.request({method: "eth_requestAccounts"})
     console.log(accounts);
     provider = new ethers.providers.Web3Provider(window.ethereum);
-
   }
   const connectWallet = async () => {
-    const web3Modal = new Web3Modal();
-    const connection = await web3Modal.connect();
-    const provider = new ethers.providers.Web3Provider(connection);
-    const signer = provider.getSigner();
+    try{
+      await connectProvider();
+      const web3Modal = new Web3Modal();
+      const connection = await web3Modal.connect();
+      const provider = new ethers.providers.Web3Provider(connection);
+      const signer = provider.getSigner();
 
-    const signature = await signer.signMessage('Connect to this website');
-    console.log(signer)
-    const address =await signer.getAddress()
-    setuserAddress(address);
-    setIsConnected(true);
-    // console.log(await signer.getAddress());
+      // const signature = await signer.signMessage('Connect to this website');
+      console.log(signer)
+      const address =await signer.getAddress()
+      setuserAddress(address);
+      setIsConnected(true);
+    }
+    catch{
+      setIsError(true);
+      setErrorMessage(`Error: connecting wallet ${error.message}`);
+    }
   }
   return (
     <div className='flex flex-col max-w-[100vw] overflow-hidden' data-theme = 'luxury'>
-
+        {
+          isError && 
+          <div className="alert alert-error w-[40vw] bottom-10 shadow-lg fixed animate-bounce ml-20 z-10">
+            <div>
+              <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current flex-shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+              <span>{errorMessage}</span>
+            </div>
+            <div className="flex-none">
+              <button className="btn btn-sm btn-primary btn" onClick={() => {setIsError(false)}}>Ok</button>
+            </div>
+          </div>
+        }
         <nav className='border-b p-6 flex flex-col w-80 h-screen shadow-xl bg-base-200 fixed '>
           <div className="font-title text-primary inline-flex text-lg transition-all duration-200 md:text-3xl">
             <Link href = "/">

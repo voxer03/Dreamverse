@@ -30,7 +30,7 @@ export default function LandingPage() {
                 Sell, Buy and List Nfts in DreamVerse         
             </div>
             </div>
-            <a className="btn btn-primary"href='https://github.com/voxer03' target={'_blank'} rel="noreferrer" > 
+            <a className="btn btn-primary"href='https://github.com/voxer03/Dreamverse' target={'_blank'} rel="noreferrer" > 
                 <FaGithub size={'1.5rem'}/>
                 <span className="ml-2">
                     Click Here for Source Code

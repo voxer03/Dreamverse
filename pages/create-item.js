@@ -24,6 +24,9 @@ export default function CreateItem () {
     const [sell, setSell] = useState(false);
     const [isFormComplete, setIsFormComplete] = useState(false);
 
+    const [isCreating, setIsCreating] = useState(false);
+    const [messageInfo, setMessageInfo] = useState('Creating your nft');
+ 
     const [isError,setIsError] = useState(false);
     const [errorMessage, setErrorMessage] = useState('Error');
     const router = useRouter()
@@ -79,17 +82,20 @@ export default function CreateItem () {
 
       try{  
         // if(!isFormComplete) return;
+        setIsCreating(true);
+        setMessageInfo('Uploading On IPFS');
         const metadataUrl = await uploadToIPFS();
+        
         const web3Modal = new Web3Modal();
         const connection = await web3Modal.connect();
         const provider = new ethers.providers.Web3Provider(connection);
         const signer = provider.getSigner();
 
-        console.log(provider);
-        
         
         const dreamverse = new ethers.Contract(NFT_ADDRESS, NFT_ABI.abi,signer);
+        setMessageInfo('Confirm Transaction on Metamask to Mint');
         let transaction = await dreamverse.mint(metadataUrl);
+        setMessageInfo('Wait for Transaction');
         let tx = await transaction.wait();
         setMinted(true);
 
@@ -101,6 +107,7 @@ export default function CreateItem () {
         const price = ethers.utils.parseUnits(formInput.price, 'ether');
 
         const market = new ethers.Contract(MARKET_ADDRESS,MARKET_ABI.abi,signer);
+        setMessageInfo('Confirm Transaction on Metamask to List');
         let listingPrice = await market.getlistingPrice();
         listingPrice = listingPrice.toString();
 
@@ -108,9 +115,11 @@ export default function CreateItem () {
             NFT_ADDRESS, tokenId, price, {
                 value: listingPrice
             });
-        await transaction.wait();
         setSell(true);
-        router.push('/markeplace');
+        setMessageInfo('Wait for Transaction');
+        await transaction.wait();
+        router.push('/marketplace');
+        setIsCreating(true);
       }
       catch(error) {
         setIsError(true);
@@ -119,11 +128,22 @@ export default function CreateItem () {
 
     }
 
-    
-
     return (
 
       <div className=' flex flex-col justify-center'>
+
+        {
+          isCreating && 
+          <div className="alert alert-info w-[40vw] bottom-10 shadow-lg fixed animate-bounce ml-20 z-10">
+            <div>
+              <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current flex-shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+              <span>{messageInfo}</span>
+            </div>
+            <div className="flex-none">
+              <button className="btn btn-sm btn-primary btn" onClick={() => {setIsError(false)}}>Ok</button>
+            </div>
+          </div>
+        }
         {
           isError && 
           <div className="alert alert-error w-[40vw] bottom-10 shadow-lg fixed animate-bounce ml-20 z-10">

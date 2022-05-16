@@ -36,7 +36,7 @@ node_modules
 coverage
 coverage.json
 typechain
-package-lock.json
+/package-lock.json
 
 #Hardhat files
 hardhat.config.js
