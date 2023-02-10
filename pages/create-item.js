@@ -1,15 +1,15 @@
 /* eslint-disable @next/next/no-img-element */
 import {useState} from 'react';
 import {ethers} from 'ethers';
-import {create as ipfsHttpClient} from 'ipfs-http-client';
+import {Web3Storage} from 'web3.storage';
 import {useRouter} from 'next/router';
 import Web3Modal from 'web3modal';
-
-const client = ipfsHttpClient('https://ipfs.infura.io:5001/api/v0');
-
 import {
-    NFT_ADDRESS, MARKET_ADDRESS
+  NFT_ADDRESS, MARKET_ADDRESS, DATA
 } from '../config';
+const web3Client = new Web3Storage({token: DATA})
+
+
 
 import NFT_ABI from '../artifacts/contracts/NFT.sol/Dreamverse.json';
 import MARKET_ABI from '../artifacts/contracts/Marketplace.sol/Marketplace.json';
@@ -43,12 +43,20 @@ export default function CreateItem () {
         setFileName(e.target.files[0].name);
         const file = e.target.files[0];
         try{
-            const added = await client.add(file,{
-                progress: (prog) => console.log(`received: ${prog}`) 
-            });
+            // const added = await client.add(file,{
+            //     progress: (prog) => console.log(`received: ${prog}`) 
+            // });
+            const added = await web3Client.put([file]);
 
-            const url = `https://ipfs.infura.io/ipfs/${added.path}`;
-            setFileurl(url);
+            await web3Client.status(added)
+            const res = await web3Client.get(added)
+            const files = await res.files()
+            // console.log(files);
+            for (const file of files) {
+              const url = `https://ipfs.io/ipfs/${file.cid}`;
+              setFileurl(url);
+            }
+
 
         } catch (error){
             console.log(error);
@@ -59,15 +67,26 @@ export default function CreateItem () {
         const { name, description, price} = formInput;
 
         if(!name || !description || !price || !fileUrl) return;
-        const metadata = JSON.stringify({
-            name,
-            description,
-            image: fileUrl
-        });
-
+        const obj = {
+          name,
+          description,
+          image: fileUrl
+        }
+        const metadata = new Blob([JSON.stringify(obj)], { type: 'application/json' })
         try{
-            const added = await client.add(metadata);
-            const metadataUrl = `https://ipfs.infura.io/ipfs/${added.path}`;
+          console.log('data')
+            const added = await web3Client.put([new File([metadata], 'metadata.json')]);
+            await web3Client.status(added)
+          console.log('data1')
+
+            const res = await web3Client.get(added)
+            const files = await res.files()
+
+            console.log(files);
+            let metadataUrl;
+            for (const file of files) {
+              metadataUrl = `https://ipfs.io/ipfs/${file.cid}`;
+            }
             return metadataUrl;
         } catch(error) {
             console.log('Error: Uploading file: ',error);

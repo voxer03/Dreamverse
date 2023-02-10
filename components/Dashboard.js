@@ -58,14 +58,14 @@ function Dashboard({nfts, soldNfts}) {
 
 
         const dreamItems = await Promise.all(dreamData.map( async (tokenUri) => {
-        const meta = await axios.get(tokenUri);
+        const meta = await axios.get(tokenUri.replace('.infura.', '.'));
         const item = meta.data;
         return item;
         }))
     
         const data = await dreamverse.itemsOwnedbyCaller();
         const items = await Promise.all(data.map(async token => {
-        const meta = await axios.get(token.tokenUri)
+        const meta = await axios.get(token.tokenUri.replace('.infura.', '.'))
         let item = {
             price: 0,
             tokenId: token.tokenId,

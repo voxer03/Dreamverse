@@ -6,7 +6,7 @@ function DashBoardCard(props) {
   return(
     <div key={index} className='border h-96 shadow rounded-xl overflow-hidden'>
       <div className="min-h-[50%] max-h-[50%] max-w-none flex justify-center overflow-hidden">
-        <img src={nft.image} alt={nft.name} className="object-contain"/>
+        <img src={nft.image.replace('.infura.', '.')} alt={nft.name} className="object-contain"/>
       </div>
       
     <div className="mt-10 bg-accent p-5">

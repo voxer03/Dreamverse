@@ -38,7 +38,7 @@ export default function CreatorDashboard() {
     
         const items = await Promise.all(data.map(async i => {
           const tokenURI = await dreamverse.tokenURI(i.tokenId)
-          const meta = await axios.get(tokenURI)
+          const meta = await axios.get(tokenURI.replace('.infura.', '.'))
           let price = ethers.utils.formatUnits(i.price.toString(), 'ether')
           let item = {
             price,
