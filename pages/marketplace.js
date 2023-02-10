@@ -27,7 +27,8 @@ export default function Home() {
 
     const items = await Promise.all(data.map(async i => {
       const tokenUri = await dreamverseContract.tokenURI(i.tokenId);
-      const meta = await axios.get(tokenUri);
+      console.log('TokenURI...', tokenUri.replace('.infura.', '.'))
+      const meta = await axios.get(tokenUri.replace('.infura.', '.'));
       let price = ethers.utils.formatUnits(i.price.toString(), 'ether');
 
       let item = {
@@ -82,7 +83,8 @@ export default function Home() {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-4">
           {
-            nfts.map( (nft, index) => {              
+            nfts.map( (nft, index) => {    
+              console.log(`${index} -> `,nft)         
               return(
                 <NftCard nft={nft} index={index} key={index} page={'sell'} buttonController={buyNFT}/>
               )

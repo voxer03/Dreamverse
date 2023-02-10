@@ -16,7 +16,7 @@ function NftCard(props) {
   return(
     <div key={index} className={style}>
       <div className="min-h-[50%] max-h-[50%] max-w-none flex justify-center overflow-hidden">
-        <img src={nft.image} alt={nft.name} className="object-contain"/>
+        <img src={nft.image.replace('.infura.', '.')} alt={nft.name} className="object-contain"/>
       
       </div>
       
