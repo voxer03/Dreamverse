@@ -47,7 +47,7 @@ export default function CreateItem () {
             //     progress: (prog) => console.log(`received: ${prog}`) 
             // });
             const added = await web3Client.put([file]);
-
+            console.log('We are here', added);
             await web3Client.status(added)
             const res = await web3Client.get(added)
             const files = await res.files()
@@ -56,8 +56,6 @@ export default function CreateItem () {
               const url = `https://ipfs.io/ipfs/${file.cid}`;
               setFileurl(url);
             }
-
-
         } catch (error){
             console.log(error);
         }
